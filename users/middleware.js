@@ -1,31 +1,26 @@
 module.exports = [
     (req, res, next) => {
-        console.log("validateuser");
         if(req.body) {
-            if(req.body.name) {
-                console.log("name = ", req.body.name);
+            if(req.body.name) 
                 next();
-            }
             else
                 res.status(400).json({ message: "missing required name field" });
         } else {
             res.status(400).json({ message: "missing user data" });
         }
     },
-    
     (req, res, next) => {
-        console.log("validatepost");
-        if(req.body) 
+        if(!(/^\/[0-9]+\/posts$/g.test(req.url) && req.method === "POST"))
+            next();
+        else if(req.body) 
             if(req.body.text)
                 next();
             else
                 res.status(400).json({ message: "missing required text field" });
         else 
             res.status(400).json({ message: "missing post data" });
-    },
-    
+    },       
     (req, res, next) => {
-        console.log("validateuserid");
         if(req.params.id)
         db.getById(req.params.id)
         .then(users => {

@@ -6,36 +6,60 @@ const middleware = require("./middleware");
 router.use(middleware);
 
 router.post('/', (req, res) => {
-    // console.log(req.body);
-    // db.insert(req.body)
-    // .then(idObj => {
-    //     console.log(idObj);
-    // })
-    res.send("post");
+    db.insert(req.body)
+    .then(user => {
+        res.status(201).json(user);
+    })
+    .catch(() => res.status(500).json({message: "error adding user to database"}));
 });
 
 router.post('/:id/posts', (req, res) => {
-
 });
 
 router.get('/', (req, res) => {
-
+    db.get()
+    .then(users => res.status(200).json(users))
+    .catch(() => res.status(500).json({message: "error retrieving users from database"}));
 });
 
 router.get('/:id', (req, res) => {
-
+    db.getById(req.params.id)
+    .then(user => user ? res.status(200).json(user) : res.status(404).json({message: "user not found"}))
+    .catch(() => res.status(500).json({message: "error retrieving user information"}));
 });
 
 router.get('/:id/posts', (req, res) => {
-
-});
-
-router.delete('/:id', (req, res) => {
-
+    db.getById(req.params.id)
+    .then(user => user ? 
+        db.getUserPosts(req.params.id)
+        .then(posts => res.status(200).json(posts))
+        .catch(() => res.status(500).json({message: "could not retrieve user's posts"})) : 
+        res.status(404).json({message: "user not found"}))
+        .catch(() => res.status(500).json({message: "error retrieving user information"}));
+    });
+    
+    router.delete('/:id', (req, res) => {
+        db.getById(req.params.id)
+        .then(user => user ? 
+            db.remove(req.params.id)
+            .then(() => res.status(200).json(user))
+            .catch(() => res.status(500).json({message: "error removing user"})): 
+            res.status(404).json({message: "user not found"}))
+        .catch(() => res.status(500).json({message: "error retrieving user information"}));
 });
 
 router.put('/:id', (req, res) => {
-
+    db.getById(req.params.id)
+    .then(user => {
+        if(user) {
+            db.update(req.params.id, {...user, name: req.body.name})
+            .then(() => res.sendStatus(200))
+            .catch(() => res.status(500).json({message: "could not update user name"}))
+        } else {
+            res.status(404).json({message: "user id not found"})
+        }
+    })
+    .catch(() => res.status(500).json({message: "could not retrieve user information"}));
 });
 
 //custom middleware
