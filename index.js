@@ -1,4 +1,6 @@
 // code away!
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 const postRouter = require("./posts/postRouter");
@@ -13,4 +15,4 @@ app.use(express.json(), logger);
 app.use("/api/posts", postRouter);
 app.use("/api/users", userRouter);
 
-app.listen(8000, () => console.log("server listening port 8000"));
+app.listen(process.env.PORT, () => console.log(`server listening port ${process.env.PORT}`));
