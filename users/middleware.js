@@ -1,7 +1,7 @@
 module.exports = [
     (req, res, next) => {
         if(req.body) {
-            if(req.body.name) 
+            if(req.body.name || req.method === "GET") 
                 next();
             else
                 res.status(400).json({ message: "missing required name field" });
